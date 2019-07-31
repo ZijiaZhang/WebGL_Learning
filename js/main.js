@@ -3,9 +3,12 @@ const myVertexShader = [
   "attribute vec3 position;",
   "attribute vec3 color;",
   "varying vec3 fragColor;",
+  "uniform mat4 mWorld;",
+  "uniform mat4 mView;",
+  "uniform mat4 mProj;",
   "void main(){",
   "fragColor = color;",
-  "gl_Position = vec4(position,1);",
+  "gl_Position = mProj * mView * mWorld * vec4(position,1);",
   "}"
 ].join("\n");
 
@@ -21,14 +24,15 @@ const myFragmentShader = [
 var glstart = function(){
 
   console.log("Working");
-  var gl = document.getElementById("gameFrame").getContext("webgl");
+  var canvas = document.getElementById("gameFrame");
+  var gl = canvas.getContext("webgl");
 
   if(!gl){
     alert("Error Initializing OPENGL");
     return;
   }
 
-  gl.clearColor(1,1,1,1);
+  gl.clearColor(0,1,1,1);
   gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
 
   var VertexShader = gl.createShader(gl.VERTEX_SHADER);
@@ -53,16 +57,16 @@ var glstart = function(){
 var myProgram = gl.createProgram();
   gl.attachShader(myProgram,VertexShader);
   gl.attachShader(myProgram,FragmentShader);
-  gl.linkProgram(myProgram)
+  gl.linkProgram(myProgram);
   if(!gl.getProgramParameter(myProgram,gl.LINK_STATUS)){
     console.error("Error link Program", gl.getProgramInfoLog(myProgram));
   }
 
   var verts = [
     //x,y,z,r,g,b
-    0.5,0.5,0.5, 1,0,0,
-    0.5,-0.5,0.5, 0,1,0,
-    -0.5,0,0.5, 0,0,1,
+    0.5,0.5,0.0, 1,0,0,
+    0.5,-0.5,0.0, 0,1,0,
+    -0.5,0.0,0.0, 0,0,1,
 
   ];
 
@@ -80,7 +84,7 @@ gl.FLOAT,
   gl.FALSE,
 6*Float32Array.BYTES_PER_ELEMENT,
   0
-)
+);
   gl.vertexAttribPointer(
     colorAttributeLocation,
     3,
@@ -88,35 +92,45 @@ gl.FLOAT,
     gl.FALSE,
     6*Float32Array.BYTES_PER_ELEMENT,
     3*Float32Array.BYTES_PER_ELEMENT
-  )
+  );
   gl.enableVertexAttribArray(positionAttributeLocation);
   gl.enableVertexAttribArray(colorAttributeLocation);
+  gl.useProgram(myProgram);
 
+  var worldMatrixIndex = gl.getUniformLocation(myProgram,"mWorld");
+  var viewMatrixIndex = gl.getUniformLocation(myProgram,"mView");
+  var projMatrixINdex = gl.getUniformLocation(myProgram,"mProj");
+  var myWorldMatrix = new Float32Array(16);
+  var myViewMatrix = new Float32Array(16);
+  var myProjMatrix = new Float32Array(16);
+
+  mat4.identity(myWorldMatrix);
+  mat4.lookAt(myViewMatrix,[0,0,5],[0,0,0],[0,1,0]);
+  mat4.perspective(myProjMatrix,glMatrix.toRadian(45),canvas.clientWidth/canvas.clientHeight,0.1,1000.0);
+
+  gl.uniformMatrix4fv(worldMatrixIndex,gl.FALSE,myWorldMatrix);
+  gl.uniformMatrix4fv(viewMatrixIndex,gl.FALSE,myViewMatrix);
+  gl.uniformMatrix4fv(projMatrixINdex,gl.FALSE,myProjMatrix);
+
+  var rotationMatrix = new Float32Array(16);
+  var identityMatrix = new Float32Array(16);
+  mat4.identity(identityMatrix);
+  var time = 0;
   var render = function(){
-    if(Math.random() <0.5)
-      verts[0] = verts[0]+0.01;
-    else
-      verts[0] = verts[0] - 0.01;
 
-    if(Math.random() <0.5)
-      verts[6] = verts[6]+0.01;
-    else
-      verts[6] = verts[6] - 0.01;
+    time = performance.now()/1000/6*2*Math.PI;
+    gl.clear(gl.DEPTH_BUFFER_BIT|gl.COLOR_BUFFER_BIT);
+    //gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(verts),gl.STATIC_DRAW);
+    mat4.rotate(rotationMatrix,identityMatrix,time,[0,1,0]);
 
-    if(Math.random() <0.5)
-      verts[12] = verts[12]+0.01;
-    else
-      verts[12] = verts[12] - 0.01;
-
-    gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(verts),gl.STATIC_DRAW);
-
-    gl.clearColor(Math.random(),Math.random(),Math.random(),1);
-    gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
-    gl.useProgram(myProgram);
+    gl.uniformMatrix4fv(worldMatrixIndex,gl.FALSE,rotationMatrix);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
-    window.setTimeout(render,1000/60);
-  }
-  render();
-}
+
+    requestAnimationFrame(render);
+  };
+  requestAnimationFrame(render);
+//render();
+};
+
 
 
