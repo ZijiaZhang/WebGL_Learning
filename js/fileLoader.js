@@ -1,4 +1,22 @@
 // Load a text resource from a file over the network
+var loadResource = function(info,callback){
+  if(info.length!==2) callback("Info is not completed" + info);
+  switch (info[0]) {
+    case "text":
+      loadTextResource(info[1],callback);
+      break;
+    case "image":
+      loadImage(info[1],callback);
+      break;
+    case "json":
+      loadJSONResource(info[1],callback);
+      break;
+    default:
+      loadTextResource(info[1],callback);
+  }
+};
+
+
 var loadTextResource = function (url, callback) {
   var request = new XMLHttpRequest();
   request.open('GET', url , true);
@@ -26,10 +44,12 @@ var loadJSONResource = function (url, callback) {
       callback(err);
     } else {
       try {
-        callback(null, JSON.parse(result));
+        var x = JSON.parse(result);
+
       } catch (e) {
-        callback(e);
+        return callback(e);
       }
+      callback(null, x);
     }
   });
 };
