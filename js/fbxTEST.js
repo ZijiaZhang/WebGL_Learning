@@ -104,6 +104,7 @@ var Initialize = function (data,datainfos){
     var maxVertices = myModel.meshes[i].vertices;
     var maxIndices = [].concat.apply([], myModel.meshes[i].faces);
     var maxTexCoords = myModel.meshes[i].texturecoords[0];
+    var maxNormals = myModel.meshes[i].normals;
 
     var maxPosVertexBufferObject = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, maxPosVertexBufferObject);
@@ -116,6 +117,13 @@ var Initialize = function (data,datainfos){
     var maxIndexBufferObject = gl.createBuffer();
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, maxIndexBufferObject);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(maxIndices), gl.STATIC_DRAW);
+
+
+    var maxNormalBufferObject = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER,maxNormalBufferObject);
+    gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(maxNormals),gl.STATIC_DRAW);
+
+
 
     gl.bindBuffer(gl.ARRAY_BUFFER, maxPosVertexBufferObject);
     var positionAttribLocation = gl.getAttribLocation(myProgram, 'vertPosition');
@@ -141,6 +149,24 @@ var Initialize = function (data,datainfos){
     );
     gl.enableVertexAttribArray(texCoordAttribLocation);
 
+    gl.bindBuffer(gl.ARRAY_BUFFER,maxNormalBufferObject);
+    var normalAttLocation = gl.getAttribLocation(myProgram,'vertNormal');
+    gl.vertexAttribPointer(
+      normalAttLocation, 3,
+      gl.FLOAT,gl.TRUE,
+      3* Float32Array.BYTES_PER_ELEMENT,0
+    );
+    gl.enableVertexAttribArray(maxNormalBufferObject);
+
+
+    gl.useProgram(myProgram);
+    var ambientUniformLocation = gl.getUniformLocation(myProgram, 'skyLightIntensity');
+    var sunlightDirUniformLocation = gl.getUniformLocation(myProgram, 'directionalLight.direction');
+    var sunlightIntUniformLocation = gl.getUniformLocation(myProgram, 'directionalLight.color');
+
+    gl.uniform3f(ambientUniformLocation, 0.3, 0.3, 0.3);
+    gl.uniform3f(sunlightDirUniformLocation, 2.0, -2.0, 2.0);
+    gl.uniform3f(sunlightIntUniformLocation, 20, 20, 20);
 
     var texture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -153,7 +179,7 @@ var Initialize = function (data,datainfos){
     gl.bindTexture(gl.TEXTURE_2D, null);
 
 
-    gl.useProgram(myProgram);
+    //gl.useProgram(myProgram);
 
     var worldMatrix = new Float32Array(16);
     var viewMatrix = new Float32Array(16);
@@ -195,8 +221,10 @@ var Initialize = function (data,datainfos){
       VertexBuffer: maxPosVertexBufferObject,
       TexcoodBuffer: maxTexCoordVertexBufferObject,
       IndexBuffer: maxIndexBufferObject,
+      normalBuffer:maxNormalBufferObject,
       positionAttLoc: positionAttribLocation,
       texCoordAttLoc:texCoordAttribLocation,
+      normalAttLoc: normalAttLocation,
       texture: texture,
       tick: function(object){
         gl.bindTexture(gl.TEXTURE_2D,object.texture);
@@ -220,8 +248,8 @@ var Initialize = function (data,datainfos){
 
     gl.clear(gl.DEPTH_BUFFER_BIT|gl.COLOR_BUFFER_BIT);
     objects.forEach(function (object) {
-      gl.bindBuffer(gl.ARRAY_BUFFER, object.VertexBuffer);
-      gl.bindBuffer(gl.ARRAY_BUFFER, object.TexcoodBuffer);
+      // gl.bindBuffer(gl.ARRAY_BUFFER, object.VertexBuffer);
+      // gl.bindBuffer(gl.ARRAY_BUFFER, object.TexcoodBuffer);
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, object.IndexBuffer);
       gl.bindBuffer(gl.ARRAY_BUFFER, object.VertexBuffer);
       gl.vertexAttribPointer(
@@ -245,6 +273,16 @@ var Initialize = function (data,datainfos){
       );
       gl.enableVertexAttribArray(object.texCoordAttLoc);
 
+      gl.bindBuffer(gl.ARRAY_BUFFER, object.normalBuffer);
+      gl.vertexAttribPointer(
+        object.normalAttLoc, // Attribute location
+        3, // Number of elements per attribute
+        gl.FLOAT, // Type of elements
+        gl.FALSE,
+        3 * Float32Array.BYTES_PER_ELEMENT, // Size of an individual vertex
+        0
+      );
+      gl.enableVertexAttribArray(object.normalAttLoc);
 
       gl.useProgram(object.programinfo);
 

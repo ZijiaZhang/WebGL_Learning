@@ -1,6 +1,7 @@
 // Load a text resource from a file over the network
 var loadResource = function(info,callback){
-  if(info.length!==2) callback("Info is not completed" + info);
+  if(info == null) return callback(null,null);
+  if(info.length!==2) return callback("Info is not completed" + info);
   switch (info[0]) {
     case "text":
       loadTextResource(info[1],callback);
