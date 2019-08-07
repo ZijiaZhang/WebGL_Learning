@@ -119,10 +119,24 @@ var tracerFragmentSource =
   "     vec3 normal;" +
   "     if(t == tRoom.y) {  " +
   "     normal = -normalForCube(hit, roomCubeMin, roomCubeMax);" +
-  " if(hit.x < -0.9999) surfaceColor = vec3(0.1, 0.5, 1.0);" +
-  " else if(hit.x > 0.9999) surfaceColor = vec3(0.0, 0.9, 0.1); " +
-  "ray = cosineWeightedDirection(timeSinceStart + float(bounce), normal);" +
-  "     } else if(t == 10000.0) {       break;     } else {       if(false) ; else if(t == tCube4.x && tCube4.x < tCube4.y) normal = normalForCube(hit, cubeMin4, cubeMax4); ray = reflect(ray, normal); vec3 reflectedLight = normalize(reflect(light - hit, normal)); specularHighlight = max(0.0, dot(reflectedLight, normalize(hit - origin))); specularHighlight = 2.0 * pow(specularHighlight, 20.0);     }     vec3 toLight = light - hit;     float diffuse = max(0.0, dot(normalize(toLight), normal));     float shadowIntensity = shadow(hit + normal * 0.0001, toLight);     colorMask *= surfaceColor;     accumulatedColor += colorMask * (0.5 * diffuse * shadowIntensity);     accumulatedColor += colorMask * specularHighlight * shadowIntensity;     origin = hit;   }   return accumulatedColor; } void main() {   vec3 newLight = light + uniformlyRandomVector(timeSinceStart - 53.0) * 0.1;   vec3 texture = texture2D(texture, gl_FragCoord.xy / 512.0).rgb;   gl_FragColor = vec4(mix(calculateColor(eye, initialRay, newLight), texture, textureWeight), 1.0); }"
+  //" if(hit.x < -0.9999) surfaceColor = vec3(0.1, 0.5, 1.0);" +
+  //" else if(hit.x > 0.9999) surfaceColor = vec3(0.0, 0.9, 0.1); " +
+  "ray = reflect(ray, normal);" +
+  "     } else if(t == 10000.0) {" +
+  "       break;    " +
+  " } else { " +
+  "      if(false) ;" +
+  " else " +
+  "if(t == tCube4.x && tCube4.x < tCube4.y){" +
+  " normal = normalForCube(hit, cubeMin4, cubeMax4); if(hit.x<cubeMin4.x + 0.001) surfaceColor = vec3(1.0,0.0,0.0);" +
+  " }ray = reflect(ray, normal);" +
+  " vec3 reflectedLight = normalize(reflect(light - hit, normal));" +
+  " specularHighlight = max(0.0, dot(reflectedLight, normalize(hit - origin)));" +
+  " specularHighlight = 2.0 * pow(specularHighlight, 20.0);" +
+  "     }     vec3 toLight = light - hit;" +
+  "     float diffuse = max(0.0, dot(normalize(toLight), normal));" +
+  "     float shadowIntensity = shadow(hit + normal * 0.0001, toLight);" +
+  "     colorMask *= surfaceColor;     accumulatedColor += colorMask * (0.5 * diffuse * shadowIntensity);     accumulatedColor += colorMask * specularHighlight * shadowIntensity;     origin = hit;   }   return accumulatedColor; } void main() {   vec3 newLight = light + uniformlyRandomVector(timeSinceStart - 53.0) * 0.1;   vec3 texture = texture2D(texture, gl_FragCoord.xy / 512.0).rgb;   gl_FragColor = vec4(mix(calculateColor(eye, initialRay, newLight), texture, textureWeight), 1.0); }"
 
 var gl;
 var ui;
