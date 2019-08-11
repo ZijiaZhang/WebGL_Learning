@@ -13,23 +13,6 @@ var renderFragmentSource =
   '   gl_FragColor = texture2D(texture, texCoord);' +
   ' }';
 
-// vertex shader for drawing a line
-var lineVertexSource =
-  ' attribute vec3 vertex;' +
-  ' uniform vec3 cubeMin;' +
-  ' uniform vec3 cubeMax;' +
-  ' uniform mat4 modelviewProjection;' +
-  ' void main() {' +
-  '   gl_Position = modelviewProjection * vec4(mix(cubeMin, cubeMax, vertex), 1.0);' +
-  ' }';
-
-// fragment shader for drawing a line
-var lineFragmentSource =
-  ' precision highp float;' +
-  ' void main() {' +
-  '   gl_FragColor = vec4(1.0);' +
-  ' }';
-
 var tracerVertexSource =
   ' attribute vec3 vertex;' +
   ' uniform vec3 eye, ray00, ray01, ray10, ray11;' +
@@ -98,10 +81,10 @@ var tracerFragmentSource =
   "} " +
   "vec3 uniformlyRandomDirection(float seed) { " +
   "  float u = random(vec3(12.9898, 78.233, 151.7182), seed);" +
-  "   float v = random(vec3(63.7264, 10.873, 623.6736), seed);" +
-  "   float z = 1.0 - 2.0 * u;" +
-  "   float r = sqrt(1.0 - z * z);" +
-  "   float angle = 6.283185307179586 * v;" +
+"   float v = random(vec3(63.7264, 10.873, 623.6736), seed);" +
+"   float z = 1.0 - 2.0 * u;" +
+"   float r = sqrt(1.0 - z * z);" +
+"   float angle = 6.283185307179586 * v;" +
   "   return vec3(r * cos(angle), r * sin(angle), z); } " +
   "vec3 uniformlyRandomVector(float seed) {   return uniformlyRandomDirection(seed) * sqrt(random(vec3(36.7539, 50.3658, 306.2759), seed)); } " +
   "float shadow(vec3 origin, vec3 ray) { vec2 tCube4 = intersectCube(origin, ray, cubeMin4, cubeMax4); if(tCube4.x > 0.0 && tCube4.x < 1.0 && tCube4.x < tCube4.y) return 0.0;   return 1.0; } " +
@@ -119,9 +102,9 @@ var tracerFragmentSource =
   "     vec3 normal;" +
   "     if(t == tRoom.y) {  " +
   "     normal = -normalForCube(hit, roomCubeMin, roomCubeMax);" +
-  //" if(hit.x < -0.9999) surfaceColor = vec3(0.1, 0.5, 1.0);" +
-  //" else if(hit.x > 0.9999) surfaceColor = vec3(0.0, 0.9, 0.1); " +
-  "ray = reflect(ray, normal);" +
+  " if(hit.x < -0.9999) surfaceColor = vec3(0.1, 0.5, 1.0);" +
+  " else if(hit.x > 0.9999) surfaceColor = vec3(0.0, 0.9, 0.1); " +
+  "ray = uniformlyRandomDirection(timeSinceStart);" +
   "     } else if(t == 10000.0) {" +
   "       break;    " +
   " } else { " +
@@ -129,14 +112,27 @@ var tracerFragmentSource =
   " else " +
   "if(t == tCube4.x && tCube4.x < tCube4.y){" +
   " normal = normalForCube(hit, cubeMin4, cubeMax4); if(hit.x<cubeMin4.x + 0.001) surfaceColor = vec3(1.0,0.0,0.0);" +
-  " }ray = reflect(ray, normal);" +
+  " }" +
+  "ray = reflect(ray, normal);" +
   " vec3 reflectedLight = normalize(reflect(light - hit, normal));" +
   " specularHighlight = max(0.0, dot(reflectedLight, normalize(hit - origin)));" +
   " specularHighlight = 2.0 * pow(specularHighlight, 20.0);" +
-  "     }     vec3 toLight = light - hit;" +
+  "     }" +
+  "     vec3 toLight = light - hit;" +
   "     float diffuse = max(0.0, dot(normalize(toLight), normal));" +
   "     float shadowIntensity = shadow(hit + normal * 0.0001, toLight);" +
-  "     colorMask *= surfaceColor;     accumulatedColor += colorMask * (0.5 * diffuse * shadowIntensity);     accumulatedColor += colorMask * specularHighlight * shadowIntensity;     origin = hit;   }   return accumulatedColor; } void main() {   vec3 newLight = light + uniformlyRandomVector(timeSinceStart - 53.0) * 0.1;   vec3 texture = texture2D(texture, gl_FragCoord.xy / 512.0).rgb;   gl_FragColor = vec4(mix(calculateColor(eye, initialRay, newLight), texture, textureWeight), 1.0); }"
+  "     colorMask *= surfaceColor;" +
+  "     accumulatedColor += colorMask * (0.5 * diffuse * shadowIntensity);" +
+  "     accumulatedColor += colorMask * specularHighlight * shadowIntensity;" +
+  "     origin = hit;   }" +
+  "   return accumulatedColor;" +
+  " } " +
+  "void main() " +
+  "{" +
+  "   vec3 newLight = light + uniformlyRandomVector(timeSinceStart - 53.0) * 0.1;" +
+  "   vec3 texture = texture2D(texture, gl_FragCoord.xy / 512.0).rgb;" +
+  "   gl_FragColor = vec4(mix(calculateColor(eye, initialRay, newLight), texture, textureWeight), 1.0);" +
+  " }";
 
 var gl;
 var ui;
@@ -174,63 +170,6 @@ var Initialize = function () {
     console.log("Does Not support Webgl");
     return;
   }
-  //ui = new ui
-  //renderer = new renderer
-  var rendererVertices = [
-    0, 0, 0,
-    1, 0, 0,
-    0, 1, 0,
-    1, 1, 0,
-    0, 0, 1,
-    1, 0, 1,
-    0, 1, 1,
-    1, 1, 1
-  ];
-
-  var rendererIndices = [
-    0, 1, 1, 3, 3, 2, 2, 0,
-    4, 5, 5, 7, 7, 6, 6, 4,
-    0, 4, 1, 5, 2, 6, 3, 7
-  ];
-
-  var rendererVertexBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER,rendererVertexBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(rendererVertices),gl.STATIC_DRAW);
-
-  var rendererIndexBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,rendererIndexBuffer);
-  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,new Uint16Array(rendererIndices),gl.STATIC_DRAW);
-
-
-  var rendererVertexShader = gl.createShader(gl.VERTEX_SHADER);
-  gl.shaderSource(rendererVertexShader,lineVertexSource);
-  gl.compileShader(rendererVertexShader);
-  if(!gl.getShaderParameter(rendererVertexShader,gl.COMPILE_STATUS)){
-    console.log("Compile error" + gl.getShaderInfoLog(rendererVertexShader));
-    return;
-  }
-
-  var rendererFragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
-  gl.shaderSource(rendererFragmentShader,lineFragmentSource);
-  gl.compileShader(rendererFragmentShader);
-  if(!gl.getShaderParameter(rendererFragmentShader,gl.COMPILE_STATUS)){
-    console.log("Compile error" + gl.getShaderInfoLog(rendererFragmentShader));
-    return;
-  }
-
-
-  var rendererLineProgram = gl.createProgram();
-  gl.attachShader(rendererLineProgram,rendererVertexShader);
-  gl.attachShader(rendererLineProgram,rendererFragmentShader);
-  gl.linkProgram(rendererLineProgram);
-  if(!gl.getProgramParameter(rendererLineProgram,gl.LINK_STATUS)){
-    console.log("Link Error" + gl.getProgramInfoLog(rendererLineProgram));
-    return;
-  }
-
-  var rendererVertexAttib = gl.getAttribLocation(rendererLineProgram,'vertex');
-  gl.enableVertexAttribArray(rendererVertexAttib);
-
   //Path Teacer = new PathTracer();
 
   var pathTracerVertices = [
@@ -343,11 +282,11 @@ var Initialize = function () {
   var start = new Date();
 
   var tick = function(time){
-    temp = document.getElementById("angle").value;
-    if(temp!==angleY){
-      sampleCount = 0;
-      angleY = temp;
-    }
+    // temp = document.getElementById("angle").value;
+    // if(temp!==angleY){
+    //   sampleCount = 0;
+    //   angleY = temp;
+    // }
 
     eye.elements[0] = zoomZ * Math.sin(angleY) * Math.cos(angleX);
     eye.elements[1] = zoomZ * Math.sin(angleX);
