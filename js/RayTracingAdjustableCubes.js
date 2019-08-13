@@ -86,7 +86,7 @@ var getShadowFunction = function(){
 
 
 
-var Bounces = '100';
+var Bounces = '10';
 var rayLength = '1000.0';
 var getcalculatedColorFunction = function(objects){
   return 'vec3 calculatedColor(vec3 origin, vec3 ray, vec3 light){' +
@@ -484,7 +484,7 @@ var Initialize = function() {
 
   var sample = 0;
 
-
+  var then  = performance.now();
 
   var Tick = function(){
     temp = document.getElementById("angle").value;
@@ -495,6 +495,8 @@ var Initialize = function() {
 
 
     time = performance.now();
+    document.getElementById('Frame').innerText = 1000/(time-then);
+    then = time;
     eye[0] = zoomZ * Math.sin(angleY) * Math.cos(angleX);
     eye[1] = zoomZ * Math.sin(angleX);
     eye[2] = zoomZ * Math.cos(angleY) * Math.cos(angleX);
