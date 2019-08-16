@@ -203,116 +203,6 @@ var makeTracerFragmentSource = function(objects) {
     getMainFunction();
 };
 
-var ccc = "precision highp float;\n" +
-  "uniform vec3 eye;\n" +
-  "varying vec3 initialRay;\n" +
-  "uniform float textureWeight;\n" +
-  "uniform float timeSinceStart;\n" +
-  "uniform sampler2D texture;\n" +
-  "uniform float glossiness;\n" +
-  "vec3 roomCubeMin = vec3(-1.0, -1.0, -1.0);\n" +
-  "vec3 roomCubeMax = vec3(1.0, 1.0, 1.0);\n" +
-  "uniform vec3 light;\n" +
-  "uniform vec3 Cube0Min;\n" +
-  "uniform vec3 Cube0Max;\n" +
-  "vec2 intersectCube(vec3 origin, vec3 ray, vec3 cubeMin, vec3 cubeMax) {\n" +
-  "  vec3 tMin = (cubeMin - origin) / ray;\n" +
-  "  vec3 tMax = (cubeMax - origin) / ray;\n" +
-  "  vec3 t1 = min(tMin, tMax);\n" +
-  "  vec3 t2 = max(tMin, tMax);\n" +
-  "  float tNear = max(max(t1.x, t1.y), t1.z);\n" +
-  "  float tFar = min(min(t2.x, t2.y), t2.z);\n" +
-  "  return vec2(tNear, tFar);\n" +
-  "}\n" +
-  "vec3 normalForCube(vec3 hit, vec3 cubeMin, vec3 cubeMax) {\n" +
-  "  if (hit.x < cubeMin.x + 0.0001) return vec3(-1.0, 0.0, 0.0);\n" +
-  "  else if (hit.x > cubeMax.x - 0.0001) return vec3(1.0, 0.0, 0.0);\n" +
-  "  else if (hit.y < cubeMin.y + 0.0001) return vec3(0.0, -1.0, 0.0);\n" +
-  "  else if (hit.y > cubeMax.y - 0.0001) return vec3(0.0, 1.0, 0.0);\n" +
-  "  else if (hit.z < cubeMin.z + 0.0001) return vec3(0.0, 0.0, -1.0);\n" +
-  "  else return vec3(0.0, 0.0, 1.0);\n" +
-  "}\n" +
-  "float random(vec3 scale, float seed) {\n" +
-  "  return fract(sin(dot(gl_FragCoord.xyz + seed, scale)) * 43758.5453 + seed);\n" +
-  "}\n" +
-  "vec3 cosineWeightedDirection(float seed, vec3 normal) {\n" +
-  "  float u = random(vec3(12.9898, 78.233, 151.7182), seed);\n" +
-  "  float v = random(vec3(63.7264, 10.873, 623.6736), seed);\n" +
-  "  float r = sqrt(u);\n" +
-  "  float angle = 6.283185307179586 * v;\n" +
-  "  vec3 sdir, tdir;\n" +
-  "  if (abs(normal.x) < .5) {\n" +
-  "    sdir = cross(normal, vec3(1, 0, 0));\n" +
-  "  } else {\n" +
-  "    sdir = cross(normal, vec3(0, 1, 0));\n" +
-  "  }\n" +
-  "  tdir = cross(normal, sdir);\n" +
-  "  return r * cos(angle) * sdir + r * sin(angle) * tdir + sqrt(1. - u) * normal;\n" +
-  "}\n" +
-  "vec3 uniformlyRandomDirection(float seed) {\n" +
-  "  float u = random(vec3(12.9898, 78.233, 151.7182), seed);\n" +
-  "  float v = random(vec3(63.7264, 10.873, 623.6736), seed);\n" +
-  "  float z = 1.0 - 2.0 * u;\n" +
-  "  float r = sqrt(1.0 - z * z);\n" +
-  "  float angle = 6.283185307179586 * v;\n" +
-  "  return vec3(r * cos(angle), r * sin(angle), z);\n" +
-  "}\n" +
-  "vec3 uniformlyRandomVector(float seed) {\n" +
-  "  return uniformlyRandomDirection(seed) * sqrt(random(vec3(36.7539, 50.3658, 306.2759), seed));\n" +
-  "}\n" +
-  "float shadow(vec3 origin, vec3 ray) {\n" +
-  "  vec2 tCube4 = intersectCube(origin, ray, Cube0Min, Cube0Max);\n" +
-  "  if (tCube4.x > 0.0 && tCube4.x < 1.0 && tCube4.x < tCube4.y) return 0.0;\n" +
-  "  return 1.0;\n" +
-  "}\n" +
-  "vec3 calculateColor(vec3 origin, vec3 ray, vec3 light) {\n" +
-  "  vec3 colorMask = vec3(1.0);\n" +
-  "  vec3 accumulatedColor = vec3(0.0);\n" +
-  "  for (int bounce = 0; bounce < 100; bounce++) {\n" +
-  "    vec2 tRoom = intersectCube(origin, ray, roomCubeMin, roomCubeMax);\n" +
-  "    vec2 tCube4 = intersectCube(origin, ray, Cube0Min, Cube0Max);\n" +
-  "    float t = 10000.0;\n" +
-  "    if (tRoom.x < tRoom.y) t = tRoom.y;\n" +
-  "    if (tCube4.x > 0.0 && tCube4.x < tCube4.y && tCube4.x < t) t = tCube4.x;\n" +
-  "    vec3 hit = origin + ray * t;\n" +
-  "    vec3 surfaceColor = vec3(0.75);\n" +
-  "    float specularHighlight = 0.0;\n" +
-  "    vec3 normal;\n" +
-  "    if (t == tRoom.y) {\n" +
-  "      normal = -normalForCube(hit, roomCubeMin, roomCubeMax);\n" +
-  "      if (hit.x < -0.9999) surfaceColor = vec3(0.1, 0.5, 1.0);\n" +
-  "      else if (hit.x > 0.9999) surfaceColor = vec3(0.0, 0.9, 0.1);\n" +
-  "      ray = uniformlyRandomDirection(timeSinceStart);\n" +
-  "    } else if (t == 10000.0) {\n" +
-  "      break;\n" +
-  "    } else {\n" +
-  "      if (false);\n" +
-  "      else if (t == tCube4.x && tCube4.x < tCube4.y) {\n" +
-  "        normal = normalForCube(hit, Cube0Min, Cube0Max);\n" +
-  "        if (hit.x < Cube0Min.x + 0.001) surfaceColor = vec3(1.0, 0.0, 0.0);\n" +
-  "      }\n" +
-  "      ray = reflect(ray, normal);\n" +
-  "      vec3 reflectedLight = normalize(reflect(light - hit, normal));\n" +
-  "      specularHighlight = max(0.0, dot(reflectedLight, normalize(hit - origin)));\n" +
-  "      specularHighlight = 2.0 * pow(specularHighlight, 20.0);\n" +
-  "    }\n" +
-  "    vec3 toLight = light - hit;\n" +
-  "    float diffuse = max(0.0, dot(normalize(toLight), normal));\n" +
-  "    float shadowIntensity = shadow(hit + normal * 0.0001, toLight);\n" +
-  "    colorMask *= surfaceColor;\n" +
-  "    accumulatedColor += colorMask * (0.5 * diffuse * shadowIntensity);\n" +
-  "    accumulatedColor += colorMask * specularHighlight * shadowIntensity;\n" +
-  "    origin = hit;\n" +
-  "  }\n" +
-  "  return accumulatedColor;\n" +
-  "}\n" +
-  "void main() {\n" +
-  "  vec3 newLight = light + uniformlyRandomVector(timeSinceStart - 53.0) * 0.1;\n" +
-  "  vec3 texture = texture2D(texture, gl_FragCoord.xy / '+res+'.0).rgb;\n" +
-  "  gl_FragColor = vec4(mix(calculateColor(eye, initialRay, newLight), texture, textureWeight), 1.0);\n" +
-  "}\n" +
-  "\n";
-
 function Cube(cubeMin,cubeMax,id){
   this.cubeMin = cubeMin;
   this.cubeMax = cubeMax;
@@ -358,6 +248,8 @@ var objects = [
   new Cube([-0.5,-0.5,-0.5],[-0.25,-0.25,-0.25],1),
   new Cube([0.25,0.25,0.25],[0.5,0.5,0.5],2),
 ]; //List of Cubes;
+
+
 
 var buildBuffer = function(type,value){
   var buffer = gl.createBuffer();
@@ -424,6 +316,37 @@ var getEyeRay = function (mat,x,y) {
   return temp;
 };
 
+var program = null;
+var tracerVertexAttribIndex = 0;
+var sample = 0;
+var updateProgram = function(){
+  Bounces = parseInt(document.getElementById("Bounces").value).toString();
+  sample = 0;
+
+  var cubeMin1s = document.getElementsByClassName("CubeMin1");
+  var cubeMin2s = document.getElementsByClassName("CubeMin2")
+  var cubeMin3s = document.getElementsByClassName("CubeMin3")
+  var cubeMax1s = document.getElementsByClassName("CubeMax1");
+  var cubeMax2s = document.getElementsByClassName("CubeMax2");
+  var cubeMax3s = document.getElementsByClassName("CubeMax3");
+
+  objects = [];
+  for(var i = 0; i< cubeMin1s.length; i++){
+    objects.push(new Cube([parseFloat(cubeMin1s[i].value),
+      parseFloat(cubeMin2s[i].value),
+      parseFloat(cubeMin3s[i].value)
+    ],[parseFloat(cubeMax1s[i].value),
+      parseFloat(cubeMax2s[i].value),
+      parseFloat(cubeMax3s[i].value)
+    ],i));
+  }
+
+  program = makeProgram(tracerVertexSource, makeTracerFragmentSource(objects));
+  tracerVertexAttribIndex = gl.getAttribLocation(program,'vertex');
+  gl.enableVertexAttribArray(tracerVertexAttribIndex);
+};
+
+
 var Initialize = function() {
 
   gl = null;
@@ -438,9 +361,7 @@ var Initialize = function() {
   gl.canvas.width = res;
   gl.canvas.height = res;
   gl.viewport(0, 0, res, res);
-  var program = makeProgram(tracerVertexSource, makeTracerFragmentSource(objects));
-  var tracerVertexAttribIndex = gl.getAttribLocation(program,'vertex');
-  gl.enableVertexAttribArray(tracerVertexAttribIndex);
+
 
 
   var screenVertex = [
@@ -482,9 +403,11 @@ var Initialize = function() {
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, res, res, 0, gl.RGB, gl.UNSIGNED_BYTE, null);
   gl.bindTexture(gl.TEXTURE_2D,null);
 
-  var sample = 0;
+
 
   var then  = performance.now();
+
+  updateProgram();
 
   var Tick = function(){
     temp = document.getElementById("angle").value;
@@ -495,7 +418,7 @@ var Initialize = function() {
 
 
     time = performance.now();
-    document.getElementById('Frame').innerText = 1000/(time-then);
+    document.getElementById('Frame').innerText = Math.floor(1000/(time-then));
     then = time;
     eye[0] = zoomZ * Math.sin(angleY) * Math.cos(angleX);
     eye[1] = zoomZ * Math.sin(angleX);
@@ -553,3 +476,4 @@ var Initialize = function() {
 
   console.log("Working");
 };
+
