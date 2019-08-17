@@ -324,8 +324,8 @@ var updateProgram = function(){
   sample = 0;
 
   var cubeMin1s = document.getElementsByClassName("CubeMin1");
-  var cubeMin2s = document.getElementsByClassName("CubeMin2")
-  var cubeMin3s = document.getElementsByClassName("CubeMin3")
+  var cubeMin2s = document.getElementsByClassName("CubeMin2");
+  var cubeMin3s = document.getElementsByClassName("CubeMin3");
   var cubeMax1s = document.getElementsByClassName("CubeMax1");
   var cubeMax2s = document.getElementsByClassName("CubeMax2");
   var cubeMax3s = document.getElementsByClassName("CubeMax3");
@@ -345,7 +345,20 @@ var updateProgram = function(){
   tracerVertexAttribIndex = gl.getAttribLocation(program,'vertex');
   gl.enableVertexAttribArray(tracerVertexAttribIndex);
 };
+var count = 1;
+var addCube = function(){
+  count++;
+  document.getElementById("CubeList").innerHTML+= "<li>\n  " +
+    "<label> Cube"+count+ " </label>" +
+    "<input type = \"number\" class=\"CubeMin1\" value = \"-0.25\" onchange=\"updateProgram()\">\n" +
+    "<input type = \"number\" class=\"CubeMin2\" value = \"-0.25\" onchange=\"updateProgram()\">\n" +
+    "<input type = \"number\" class=\"CubeMin3\" value = \"-0.25\" onchange=\"updateProgram()\">\n" +
+    "<input type = \"number\" class=\"CubeMax1\" value = \"0.25\" onchange=\"updateProgram()\">\n" +
+    "<input type = \"number\" class=\"CubeMax2\" value = \"0.25\" onchange=\"updateProgram()\">\n" +
+    "<input type = \"number\" class=\"CubeMax3\" value = \"0.25\" onchange=\"updateProgram()\">\n" +
+    "</li>";
 
+};
 
 var Initialize = function() {
 

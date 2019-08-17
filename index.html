@@ -8,14 +8,20 @@
 <label for="Frame"> FrameRate</label><label id="Frame"> 0</label>
 <label for="Bounces"> Bounces</label><input type = "number" id="Bounces" value = "10" onchange="updateProgram()">
 
-<label> Cube1 </label>
+
+<ul id = "CubeList">
+<li>
+  <label> Cube1 </label>
 <input type = "number" class="CubeMin1" value = "-0.25" onchange="updateProgram()">
 <input type = "number" class="CubeMin2" value = "-0.25" onchange="updateProgram()">
 <input type = "number" class="CubeMin3" value = "-0.25" onchange="updateProgram()">
 <input type = "number" class="CubeMax1" value = "0.25" onchange="updateProgram()">
 <input type = "number" class="CubeMax2" value = "0.25" onchange="updateProgram()">
 <input type = "number" class="CubeMax3" value = "0.25" onchange="updateProgram()">
-
+</li>
+</ul>
+<button onclick="addCube()">Add Cube</button>
+<br>
 <canvas id = "gameFrame" width = 600  height = 600> Browser Does not Support HTML5</canvas>
 <script src = "./js/gl-matrix.js"></script>
 <script type="text/javascript" src = "./js/async.js"></script>
