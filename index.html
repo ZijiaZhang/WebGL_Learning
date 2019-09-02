@@ -2,32 +2,18 @@
 <head>
   <title>OpenGL Test</title>
 </head>
-<body onload="Initialize();">
-
-<label for="angle"> Rotation</label><input type="range" min="1" max="6.28" step="0.001" value=0 class="slider" id="angle">
-<label for="Frame"> FrameRate</label><label id="Frame"> 0</label>
-<label for="Bounces"> Bounces</label><input type = "number" id="Bounces" value = "10" onchange="updateProgram()">
-
-
-<ul id = "CubeList">
-<li>
-  <label> Cube1 </label>
-<input type = "number" class="CubeMin1" value = "-0.25" onchange="updateProgram()">
-<input type = "number" class="CubeMin2" value = "-0.25" onchange="updateProgram()">
-<input type = "number" class="CubeMin3" value = "-0.25" onchange="updateProgram()">
-<input type = "number" class="CubeMax1" value = "0.25" onchange="updateProgram()">
-<input type = "number" class="CubeMax2" value = "0.25" onchange="updateProgram()">
-<input type = "number" class="CubeMax3" value = "0.25" onchange="updateProgram()">
-</li>
+<body>
+<a href="https://zijiazhang.com"> Home Page</a>
+<ul>
+  <li><a href="./SimpleRotatingTriangle.html">Simple Rotating Triangle</a></li>
+  <li><a href="./RotatingCube.html">Simple Rotating Cube</a></li>
+  <li><a href="./rotatingCubeTexture.html">Rotating Cube with Texture</a></li>
+  <li><a href="./graphing.html">Use Webgl to Draw Graph</a></li>
+  <li><a href="./fbxTest.html">Rendering Models</a></li>
+  <li><a href="./Raytracing.html">Path Tracing Test</a></li>
 </ul>
-<button onclick="addCube()">Add Cube</button>
-<br>
-<canvas id = "gameFrame" width = 600  height = 600> Browser Does not Support HTML5</canvas>
-<script src = "./js/gl-matrix.js"></script>
-<script type="text/javascript" src = "./js/async.js"></script>
-<script type="text/javascript" src = "./js/fileLoader.js"></script>
-<script src ='./js/glUtils.js'></script>
-<script type="text/javascript" src = "./js/RayTracingAdjustableCubes.js"></script>
+
+
 
 </body>
 </html>

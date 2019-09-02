@@ -17,7 +17,7 @@ var glstart = function(){
   var meta = {
     modelcount: 7,
     texturecount: 7
-  }
+  };
   var results= {};
   async.forEachOf(files,function(value,key,callback2){
     loadResource(value,function(err,data){

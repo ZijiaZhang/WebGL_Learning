@@ -360,6 +360,7 @@ var addCube = function(){
 
 };
 
+
 var Initialize = function() {
 
   gl = null;
