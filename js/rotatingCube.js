@@ -129,6 +129,7 @@ var glstart = function (){
     23,20,21,
   ];
 
+
   var vertexBuffer =  gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER,vertexBuffer);
   gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(vertexs),gl.STATIC_DRAW);

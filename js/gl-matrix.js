@@ -90,7 +90,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 		return getter;
 /******/ 	};
 /******/
-/******/ 	// Object.prototype.hasOwnProperty.call
+/******/ 	// RenderObject.prototype.hasOwnProperty.call
 /******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
 /******/
 /******/ 	// __webpack_public_path__
@@ -5134,7 +5134,7 @@ function perspective(out, fovy, aspect, near, far) {
  * with the still experiemental WebVR API.
  *
  * @param {mat4} out mat4 frustum matrix will be written into
- * @param {Object} fov Object containing the following values: upDegrees, downDegrees, leftDegrees, rightDegrees
+ * @param {Object} fov RenderObject containing the following values: upDegrees, downDegrees, leftDegrees, rightDegrees
  * @param {number} near Near bound of the frustum
  * @param {number} far Far bound of the frustum
  * @returns {mat4} out

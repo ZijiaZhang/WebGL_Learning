@@ -442,7 +442,7 @@ tutorial](https://developers.facebook.com/docs/sharing/webmasters/getting-starte
 
 For a reference of Open Graph's markup and properties, you may check
 [Facebook's Open Graph Protocol reference](http://ogp.me/). Finally,
-you can validate your markup with the [Facebook Object
+you can validate your markup with the [Facebook RenderObject
 Debugger](https://developers.facebook.com/tools/debug/) (needs
 registration to Facebook).
 

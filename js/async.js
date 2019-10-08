@@ -570,7 +570,7 @@
      * in order. However, the results array will be in the same order as the
      * original `coll`.
      *
-     * If `map` is passed an Object, the results will be an Array.  The results
+     * If `map` is passed an RenderObject, the results will be an Array.  The results
      * will roughly be in the order of the original Objects' keys (but this can
      * vary across JavaScript engines).
      *
@@ -2594,7 +2594,7 @@
      * The iteratee should complete with a `key` to group the value under.
      * Invoked with (value, callback).
      * @param {Function} [callback] - A callback which is called when all `iteratee`
-     * functions have finished, or an error occurs. Result is an `Object` whoses
+     * functions have finished, or an error occurs. Result is an `RenderObject` whoses
      * properties are arrays of values which returned the corresponding key.
      * @returns {Promise} a promise, if no callback is passed
      */
@@ -2651,7 +2651,7 @@
      * The iteratee should complete with a `key` to group the value under.
      * Invoked with (value, callback).
      * @param {Function} [callback] - A callback which is called when all `iteratee`
-     * functions have finished, or an error occurs. Result is an `Object` whoses
+     * functions have finished, or an error occurs. Result is an `RenderObject` whoses
      * properties are arrays of values which returned the corresponding key.
      * @returns {Promise} a promise, if no callback is passed
      * @example
@@ -2685,7 +2685,7 @@
      * The iteratee should complete with a `key` to group the value under.
      * Invoked with (value, callback).
      * @param {Function} [callback] - A callback which is called when all `iteratee`
-     * functions have finished, or an error occurs. Result is an `Object` whoses
+     * functions have finished, or an error occurs. Result is an `RenderObject` whoses
      * properties are arrays of values which returned the corresponding key.
      * @returns {Promise} a promise, if no callback is passed
      */
@@ -2762,7 +2762,7 @@
     /**
      * A relative of [`map`]{@link module:Collections.map}, designed for use with objects.
      *
-     * Produces a new Object by mapping each value of `obj` through the `iteratee`
+     * Produces a new RenderObject by mapping each value of `obj` through the `iteratee`
      * function. The `iteratee` is called each `value` and `key` from `obj` and a
      * callback for when it has finished processing. Each of these callbacks takes
      * two arguments: an `error`, and the transformed item from `obj`. If `iteratee`
@@ -4276,7 +4276,7 @@
     }
 
     /**
-     * A relative of `reduce`.  Takes an Object or Array, and iterates over each
+     * A relative of `reduce`.  Takes an RenderObject or Array, and iterates over each
      * element in parallel, each step potentially mutating an `accumulator` value.
      * The type of the accumulator defaults to the type of collection passed in.
      *
@@ -4287,7 +4287,7 @@
      * @category Collection
      * @param {Array|Iterable|AsyncIterable|Object} coll - A collection to iterate over.
      * @param {*} [accumulator] - The initial state of the transform.  If omitted,
-     * it will default to an empty Object or Array, depending on the type of `coll`
+     * it will default to an empty RenderObject or Array, depending on the type of `coll`
      * @param {AsyncFunction} iteratee - A function applied to each item in the
      * collection that potentially modifies the accumulator.
      * Invoked with (accumulator, item, key, callback).
