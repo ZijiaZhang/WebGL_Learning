@@ -14,6 +14,7 @@ export class Dragon extends RenderObject{
   x = 0;
   y = 0;
   z = 0;
+  speed = 10;
   globalPos = [0,0,0];
   globalPos1 = [0,1,0];
   globalRot = [0, 180, 0];
@@ -179,6 +180,10 @@ export class Dragon extends RenderObject{
   dead = false;
   ttt = 0;
   update(dt) {
+    this.z -= this.speed*dt;
+    World.camera.position.z -= this.speed*dt;
+    World.controls.target.z -= this.speed*dt;
+    World.controls.update();
     if(!this.dead)
       this.dragonMotion.timestep(dt);
     else {
@@ -266,21 +271,24 @@ export class BadDragon extends Dragon{
 
   time = 1;
   update(dt) {
+    this.z -= this.speed*dt;
     if(!this.dead)
     this.dragonMotion.timestep(dt);
-    else
+    else {
       this.dragonMotion2.timestep(dt);
+      return this.destroy();
+    }
     this.time -= dt;
     if (this.time < 0){
-      let k = Math.random();
-      let j = Math.random();
-      World.addObject(new badBullet(this.scene, this.x,this.y, this.z, (t)=> k*t, (t) =>j*t, (z)=>30*z));
-      this.time = 1;
+      let k = Math.random()*2 - 1;
+      let j = Math.random()*2 -1;
+      World.addObject(new badBullet(this.scene, this.x,this.y, this.z, (t)=> k*30*t, (t) =>j*30*t, (z)=>30*z));
+      this.time = 0.1;
     }
     this.collision();
   }
 
-  hp = 100;
+  hp = 1000;
 
   hit(){
     this.hp -=1;
@@ -288,7 +296,7 @@ export class BadDragon extends Dragon{
       console.log("Win");
       this.dead = true;
     }
-    document.getElementById("hp").max = 100;
+    document.getElementById("hp").max = 1000;
     document.getElementById("hp").value = this.hp;
   }
 
