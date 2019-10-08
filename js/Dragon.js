@@ -164,13 +164,21 @@ export class Dragon extends RenderObject{
   {
     if (this.keyboard.pressed("w")) {
       this.y = this.y + 10 * dt;
+      World.camera.position.y += 10 * dt;
+      World.controls.target.y += 10 * dt;
     } else if (this.keyboard.pressed("s")) {
       this.y = this.y - 10 * dt;
+      World.camera.position.y -= 10 * dt;
+      World.controls.target.y -= 10 * dt;
     }
     if (this.keyboard.pressed("a")) {
       this.x = this.x - 10 * dt;
+      World.camera.position.x -= 10 * dt;
+      World.controls.target.x -= 10 * dt;
     } else if (this.keyboard.pressed("d")) {
       this.x = this.x + 10 * dt;
+      World.camera.position.x += 10 * dt;
+      World.controls.target.x += 10 * dt;
     }
 
     if(this.keyboard.pressed(" ")){
@@ -183,7 +191,6 @@ export class Dragon extends RenderObject{
     this.z -= this.speed*dt;
     World.camera.position.z -= this.speed*dt;
     World.controls.target.z -= this.speed*dt;
-    World.controls.update();
     if(!this.dead)
       this.dragonMotion.timestep(dt);
     else {
@@ -196,6 +203,7 @@ export class Dragon extends RenderObject{
     if(!this.dead) {
       this.control(dt);
     }
+    World.controls.update();
     this.collision();
   }
 

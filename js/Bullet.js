@@ -13,7 +13,7 @@ export class Bullet extends RenderObject{
   globalRot = [0, 0, 0];
   constructor(scene,x,y,z, funcx, funcy, funcz, color = 0xff8800) {
     super();
-    this.sphere = new THREE.Mesh(new THREE.SphereGeometry(0.5,32,32), new THREE.MeshLambertMaterial({color: color}));
+    this.sphere = new THREE.Mesh(new THREE.SphereGeometry(0.5,3,3), new THREE.MeshLambertMaterial({color: color}));
     this.scene = scene;
     this.initx = x;
     this.inity = y;
